@@ -117,6 +117,29 @@ The following image shows the resource utilization summary obtained from synthes
 
 ![Utilization Report](images/utilization.png)
 
+```
+Report Cell Usage: 
++------+-------+------+
+|      |Cell   |Count |
++------+-------+------+
+|1     |BUFG   |     1|
+|2     |CARRY4 |     8|
+|3     |LUT1   |     1|
+|4     |LUT5   |     1|
+|5     |LUT6   |     5|
+|6     |FDCE   |    30|
+|7     |IBUF   |     2|
+|8     |OBUF   |     1|
++------+-------+------+
+
+Report Instance Areas: 
++------+---------+-------+------+
+|      |Instance |Module |Cells |
++------+---------+-------+------+
+|1     |top      |       |    49|
+|2     |  IFU    |ifu    |    45|
++------+---------+-------+------+
+```
 The report includes LUT usage, register count, and mux utilization for the implemented design.
 
 ---
