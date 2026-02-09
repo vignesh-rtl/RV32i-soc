@@ -6,17 +6,17 @@ module ifu (
     input  wire        rst,
 
     output wire [31:0] instruction,
-    output reg  [31:0] pc
+    output reg [31:0] pc = 32'd0
 );
 
     //--------------------------------------------------
     // Program Counter
     //--------------------------------------------------
-    always @(posedge clk or posedge rst) begin
-        if (rst)
-            pc <= 32'd0;
-        else
-            pc <= pc + 32'd4;
+    always @(posedge clk) begin
+    if (rst)
+        pc <= 32'd0;
+    else
+        pc <= pc + 4;
     end
 
     //--------------------------------------------------

@@ -4,34 +4,46 @@ module processor_tb;
 
 reg clk;
 reg rst;
+
 wire zero_flag;
 
+// DUT
 processor_top DUT (
     .clk(clk),
     .rst(rst),
     .zero_flag(zero_flag)
 );
 
-initial begin
-    $dumpfile("wave.vcd");
-    $dumpvars(0, processor_tb);
-end
-
-// clock generation
+// ----------------------------
+// CLOCK
+// ----------------------------
 initial begin
     clk = 0;
-    forever #5 clk = ~clk;   // 100 MHz sim clock
+    forever #5 clk = ~clk;   // 100MHz sim clock
 end
 
-// reset sequence
+// ----------------------------
+// RESET
+// ----------------------------
 initial begin
     rst = 1;
     #20;
     rst = 0;
 end
 
+// ----------------------------
+// WAVES
+// ----------------------------
 initial begin
-    #200;
+    $dumpfile("wave.vcd");
+    $dumpvars(0, processor_tb);
+end
+
+// ----------------------------
+// SIM TIME
+// ----------------------------
+initial begin
+    #500;
     $finish;
 end
 
