@@ -6,6 +6,10 @@ module control (
     input  wire [2:0] funct3,
     input  wire [6:0] funct7,
 
+    output reg mem_read,
+    output reg mem_write,
+    output reg mem_to_reg,
+
     output reg  [3:0] alu_ctrl,
     output reg        reg_write
 );

@@ -47,7 +47,7 @@ module reg_file (
         regs[0]  <= 32'd0;
         regs[1]  <= 32'd5;   // test value
         regs[2]  <= 32'd7;   // test value
-//        regs[3]  <= 32'd0;
+        regs[3]  <= 32'd0;
         regs[4]  <= 32'd0;
         regs[5]  <= 32'd0;
         regs[6]  <= 32'd0;
