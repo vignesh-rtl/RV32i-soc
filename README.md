@@ -1,10 +1,4 @@
-# RV32I SoC — Version 2.0
+RV32I SoC — Version 3.0
 
-## ABOUT
-
----
-
-## AUTHOR
-
-Vignesh D  
-FPGA / RTL Design
+Fetch and decoder modules redesigned.
+Previous versions available through tags v1.0 and v2.0.
