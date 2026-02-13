@@ -8,8 +8,8 @@ module rv32i_fetch (
     input wire[31:0] i_inst, // retrieved instruction from Memory
     output reg[31:0] o_inst, // instruction sent to pipeline
     /// Pipeline Control ///
-    input wire i_ce, // input clk enable for pipeline stalling if this stage
-    output reg o_ce // output clk enable for pipeline stalling of next stage
+    input wire i_ce,  // input clk enable for pipeline stalling if this stage
+    output reg o_ce   // output clk enable for pipeline stalling of next stage
 );
     initial begin
         o_ce = 0;
@@ -28,5 +28,4 @@ module rv32i_fetch (
             o_ce <= i_ce;
         end
     end
-    
 endmodule
