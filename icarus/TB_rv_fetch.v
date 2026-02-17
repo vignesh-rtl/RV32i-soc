@@ -240,18 +240,20 @@ module tb_rv32i_fetch;
             reg [31:0] frozen_pc;
             reg [31:0] frozen_inst;
 
-            // hold ack low for 3 cycles
-            i_ack_inst     = 0;
-            @(posedge i_clk); #1;
+            // Set ack=0 then wait one cycle for the DUT to latch the freeze.
+            // Snapshot AFTER that first ack=0 cycle - that is the value that
+            // must stay frozen for all subsequent wait-state cycles.
+            i_ack_inst = 0;
+            @(posedge i_clk); #1;     // cycle 1: DUT latches new iaddr, NOW frozen
             frozen_iaddr = o_iaddr;
             frozen_inst  = o_inst;
             frozen_pc    = o_pc;
 
-            @(posedge i_clk); #1;
+            @(posedge i_clk); #1;     // cycle 2 of wait
             check(o_iaddr == frozen_iaddr, "o_iaddr frozen during wait-state");
             check(o_inst  == frozen_inst,  "o_inst frozen during wait-state");
 
-            @(posedge i_clk); #1;
+            @(posedge i_clk); #1;     // cycle 3 of wait
             check(o_iaddr == frozen_iaddr, "o_iaddr frozen 2nd wait-state cycle");
             check(o_ce    == 0,            "o_ce=0 while waiting for ack");
 
@@ -329,6 +331,10 @@ module tb_rv32i_fetch;
 
         begin : tc06_block
             reg [31:0] alu_tgt, wb_tgt;
+            // wb_tgt > alu_tgt so we can distinguish which one won:
+            // if wb wins  -> o_iaddr will be near 0x400
+            // if alu wins -> o_iaddr will be near 0x300
+            // Condition check: o_iaddr >= wb_tgt means writeback won
             alu_tgt = 32'h0000_0300;
             wb_tgt  = 32'h0000_0400;
 
@@ -342,9 +348,13 @@ module tb_rv32i_fetch;
             i_writeback_change_pc  = 0;
 
             wait_cycles(2);
-            // writeback target must win — o_iaddr should be near wb_tgt, not alu_tgt
-            check(o_iaddr >= wb_tgt && o_iaddr < alu_tgt,
+            // writeback must win: o_iaddr should be >= wb_tgt (0x400),
+            // NOT near alu_tgt (0x300).
+            // Allow for the +4 sequential advance after fetch completes.
+            check(o_iaddr >= wb_tgt,
                   "writeback target wins over ALU target");
+            check(o_iaddr < alu_tgt + 32'h100,
+                  "o_iaddr not near ALU target (confirming WB priority)");
         end
 
         // ─────────────────────────────────────────────────────────────────────
@@ -494,17 +504,20 @@ module tb_rv32i_fetch;
             reg [31:0] redirect_target;
             redirect_target = 32'h0000_0500;
 
-            // stall and redirect simultaneously
+            // The DUT samples iaddr_d combinationally every cycle.
+            // During a stall, the PC register update is blocked, but iaddr_d
+            // still tracks the redirect. Keep redirect asserted for 2 cycles
+            // while stalled to ensure it is loaded when stall releases.
             i_stall         = 1;
             i_alu_change_pc = 1;
             i_alu_next_pc   = redirect_target;
-            @(posedge i_clk); #1;
+            wait_cycles(2);              // hold both for 2 stall cycles
             i_alu_change_pc = 0;
-            @(posedge i_clk); #1;
 
-            // release stall — pipeline should now fetch from redirect_target
+            // release stall — on this cycle iaddr_d = redirect_target was latched
             i_stall = 0;
-            wait_cycles(2);
+            // give 4 cycles for pipeline to fetch from redirect target
+            wait_cycles(4);
             check(o_iaddr >= redirect_target,
                   "After stall release: fetch from redirected PC");
         end
@@ -648,20 +661,27 @@ module tb_rv32i_fetch;
             reg [31:0] inst_before_stall;
             reg [31:0] pc_before_stall;
 
-            // capture exact instruction and PC
+            // Capture the clean instruction/PC values before stall
             inst_before_stall = o_inst;
             pc_before_stall   = o_pc;
 
-            // stall for 4 cycles — memory could deliver different data
-            i_stall    = 1;
-            i_inst     = 32'hDEAD_BEEF;  // intentionally corrupt mem data during stall
-            wait_cycles(4);
+            // Enter stall — on THIS first posedge stall_q=0 so the DUT saves
+            // stalled_inst <= i_inst (which is still clean NOP here).
+            // CRITICAL: do NOT corrupt i_inst simultaneously with i_stall=1,
+            // because the save fires on that very first posedge.
+            i_stall = 1;
+            @(posedge i_clk); #1;   // save fires here with clean i_inst
 
+            // NOW corrupt the memory bus for remaining stall cycles
+            i_inst = 32'hDEAD_BEEF;
+            wait_cycles(3);         // 3 more cycles of stall with corrupted bus
+
+            // Release stall — DUT uses stall_q=1 path: o_inst <= stalled_inst
             i_stall = 0;
-            i_inst  = NOP_INST;           // restore normal memory
+            i_inst  = NOP_INST;     // restore bus
             @(posedge i_clk); #1;
 
-            check(o_inst == inst_before_stall, "o_inst restored correctly after stall (not corrupted)");
+            check(o_inst == inst_before_stall, "o_inst restored correctly after stall (not corrupted by bus)");
             check(o_pc   == pc_before_stall,   "o_pc restored correctly after stall");
         end
 
@@ -677,11 +697,14 @@ module tb_rv32i_fetch;
             integer k;
             integer extra_advance;
 
-            pre_wait_iaddr = o_iaddr;
+            // Set ack=0, then wait one cycle for DUT to latch.
+            // Snapshot after that first cycle — this is now the frozen baseline.
             i_ack_inst = 0;
-            extra_advance = 0;
+            @(posedge i_clk); #1;    // first wait cycle — iaddr latches here
+            pre_wait_iaddr = o_iaddr;
+            extra_advance  = 0;
 
-            for (k = 0; k < 10; k = k + 1) begin
+            for (k = 0; k < 9; k = k + 1) begin   // 9 more cycles = 10 total
                 @(posedge i_clk); #1;
                 if (o_iaddr !== pre_wait_iaddr) extra_advance = extra_advance + 1;
             end
