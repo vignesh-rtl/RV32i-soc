@@ -3,6 +3,9 @@ RV32I SoC — Version 3.0
 Fetch  modules redesigned.
 
 sim - rv_fetch_TB.v for rv_fetch.v simulation code.
+
+Icarus - TB_rv_fetech.v --65 testcases done with Claude AI Test cases.
+
 Previous versions available through tags v1.0 and v2.0.
 
 ---
