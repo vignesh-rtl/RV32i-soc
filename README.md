@@ -9,7 +9,6 @@ Icarus - TB_rv_fetech.v --65 testcases done with Claude AI Test cases.
 Previous versions available through tags v1.0 and v2.0.
 
 ---
-
 To run the icarus verilog simulation run the following command:
 
 ```
