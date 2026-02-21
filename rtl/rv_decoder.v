@@ -30,7 +30,6 @@ module rv_decoder(
     assign o_rs2_addr = i_inst[24:20]; //o_rs1_addrando_rs2_addr are not registered 
     assign o_rs1_addr = i_inst[19:15];   //since rv32i_basereg module do the registering itself
     
-
     wire[2:0] funct3_d = i_inst[14:12];
     wire[6:0] opcode = i_inst[6:0];
 
