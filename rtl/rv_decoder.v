@@ -201,7 +201,6 @@ module rv_decoder(
 
         else alu_add_d = 1'b1; //add operation for all remaining instructions
         /*********************************************/
-
         /************************** extend the immediate (o_imm) *********************/
         case(opcode)
         `OPCODE_ITYPE , `OPCODE_LOAD , `OPCODE_JALR: imm_d = {{20{i_inst[31]}},i_inst[31:20]}; 
