@@ -1,4 +1,4 @@
-RV32I SoC — Version 3.0
+RV32I Zyn_SoC — Version 3.0
 
 Fetch  modules redesigned.
 
