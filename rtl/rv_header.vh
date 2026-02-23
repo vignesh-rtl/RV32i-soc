@@ -59,3 +59,4 @@
 `define FUNCT3_GE 3'b101
 `define FUNCT3_LTU 3'b110
 `define FUNCT3_GEU 3'b111 
+
