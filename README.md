@@ -34,6 +34,7 @@ This section lists all files currently available in `rtl/` and a **three-word co
 
 ```bash
 iverilog -o sim TB_rv_fetch.v rv_fetch.v rv_header.vh && vvp sim
+
 ```
 
 ## Versions
