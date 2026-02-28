@@ -29,8 +29,10 @@ module rv32i_forwarding (
         o_alu_force_stall = 0;
          
         // Data Hazard = Register value is about to be overwritten by previous instructions but are still on the pipeline and are not yet written to basereg.
+        
         // The solution to make sure the updated value of rs1 or rs2 is used is to either stall the pipeline until the basereg is updated (very inefficient) or use Operand Forwarding
 
+        
             // Operand Forwarding for rs1
             if((i_decoder_rs1_addr_q == i_alu_rd_addr) && i_alu_wr_rd && i_memoryaccess_ce) begin //next value of rs1 is currently on stage 4
                 if(!i_alu_rd_valid) begin   //if next value of rs1 comes from load or CSR instruction then we must stall from ALU stage and wait until 
