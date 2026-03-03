@@ -1,3 +1,6 @@
+/* The rv32i_fetch module is primarily for fetching instructions from the memory
+and prepare them for the decode stage of the pipeline. */
+
 `timescale 1ns / 1ps
 `default_nettype none
 `include "rv32i_header.vh"
@@ -27,17 +30,17 @@ module rv32i_fetch #(parameter PC_RESET = 32'h00_00_00_00) (
     reg stall_q;
     //stall this stage when:
     //- next stages are stalled
-    //- you have request but no ack yeti
+    //- you have request but no ack yet
     //- you dont have a request at all (no request then no instruction to execute for this stage)
     wire stall_bit = stall_fetch || i_stall || (o_stb_inst && !i_ack_inst) || !o_stb_inst; 
     assign o_stb_inst = ce; //request for new instruction if this stage is enabled                                                               
-    
+
     //ce logic for fetch stage
     always @(posedge i_clk, negedge i_rst_n) begin
          if(!i_rst_n) ce <= 0;
          else if((i_alu_change_pc || i_writeback_change_pc) && !(i_stall || stall_fetch)) ce <= 0; //do pipeline bubble when need to change pc so that next stages will be disabled 
          else ce <= 1;                                                  //and will not execute the instructions already inside the pipeline
-     end
+    end
 
 
 
@@ -64,8 +67,8 @@ module rv32i_fetch #(parameter PC_RESET = 32'h00_00_00_00) (
             //if this stage is stalled but next stage is not, disable 
             //clock enable of next stage at next clock cycle (pipeline bubble)
             else if(stall_bit && !i_stall) o_ce <= 0; 
-                                                                    
-                
+
+
             stall_q <= i_stall || stall_fetch; //raise stall when any of 5 stages is stalled
 
             //store both instruction and PC before stalling so that we can
@@ -97,5 +100,6 @@ module rv32i_fetch #(parameter PC_RESET = 32'h00_00_00_00) (
             ce_d = ce;
         end
     end
-    
+
 endmodule
+
