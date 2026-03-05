@@ -1,20 +1,21 @@
+/* The rv32i_decoder module is responsible for decoding the 32-bit RISC-V instructions */
 
 `timescale 1ns / 1ps
 `default_nettype none
 `include "rv32i_header.vh"
 
-module rv_decoder(
+module rv32i_decoder(
     input wire i_clk,i_rst_n,
     input wire[31:0] i_inst, //32 bit instruction
     input wire[31:0] i_pc, //PC value from previous stage
     output reg[31:0] o_pc, //PC value
-    output wire[4:0] o_rs1_addr,//address for register source 1
-    output reg[4:0] o_rs1_addr_q,//registered address for register source 1
-    output wire[4:0] o_rs2_addr, //address for register source 2
-    output reg[4:0] o_rs2_addr_q, //registered address for register source 2
-    output reg[4:0] o_rd_addr, //address for destination address
-    output reg[31:0] o_imm, //extended value for immediate
-    output reg[2:0] o_funct3, //function type
+    output wire[4:0] o_rs1_addr,// address for register source 1
+    output reg[4:0] o_rs1_addr_q,// registered address for register source 1
+    output wire[4:0] o_rs2_addr, // address for register source 2
+    output reg[4:0] o_rs2_addr_q, // registered address for register source 2
+    output reg[4:0] o_rd_addr, // address for destination address
+    output reg[31:0] o_imm, // extended value for immediate
+    output reg[2:0] o_funct3, // function type
     output reg[`ALU_WIDTH-1:0] o_alu, //alu operation type
     output reg[`OPCODE_WIDTH-1:0] o_opcode, //opcode type
     output reg[`EXCEPTION_WIDTH-1:0] o_exception, //exceptions: illegal inst, ecall, ebreak, mret
@@ -27,9 +28,10 @@ module rv_decoder(
     output reg o_flush //flush previous stages
 );
 
-    assign o_rs2_addr = i_inst[24:20]; //o_rs1_addrando_rs2_addr are not registered 
+    assign o_rs2_addr = i_inst[24:20]; //o_rs1_addr and o_rs2_addr are not registered 
     assign o_rs1_addr = i_inst[19:15];   //since rv32i_basereg module do the registering itself
-    
+
+
     wire[2:0] funct3_d = i_inst[14:12];
     wire[6:0] opcode = i_inst[6:0];
 
@@ -48,7 +50,7 @@ module rv_decoder(
     reg alu_neq_d;
     reg alu_ge_d; 
     reg alu_geu_d;
-    
+
     reg opcode_rtype_d;
     reg opcode_itype_d;
     reg opcode_load_d;
@@ -60,7 +62,7 @@ module rv_decoder(
     reg opcode_auipc_d;
     reg opcode_system_d;
     reg opcode_fence_d;
-            
+
     reg system_noncsr = 0;
     reg valid_opcode = 0;
     reg illegal_shift = 0;
@@ -79,7 +81,7 @@ module rv_decoder(
                 o_rd_addr  <= i_inst[11:7];
                 o_funct3   <= funct3_d;
                 o_imm      <= imm_d;
-                
+
                 /// ALU Operations ////
                 o_alu[`ADD]  <= alu_add_d;
                 o_alu[`SUB]  <= alu_sub_d;
@@ -95,7 +97,7 @@ module rv_decoder(
                 o_alu[`NEQ]  <= alu_neq_d;
                 o_alu[`GE]   <= alu_ge_d; 
                 o_alu[`GEU]  <= alu_geu_d;
-                          
+
                 o_opcode[`RTYPE]  <= opcode_rtype_d;
                 o_opcode[`ITYPE]  <= opcode_itype_d;
                 o_opcode[`LOAD]   <= opcode_load_d;
@@ -107,16 +109,16 @@ module rv_decoder(
                 o_opcode[`AUIPC]  <= opcode_auipc_d;
                 o_opcode[`SYSTEM] <= opcode_system_d;
                 o_opcode[`FENCE]  <= opcode_fence_d;
-                
+
                 /*********************** decode possible exceptions ***********************/
                 o_exception[`ILLEGAL] <= !valid_opcode || illegal_shift;
 
                 // Check if ECALL
                 o_exception[`ECALL] <= (system_noncsr && i_inst[21:20]==2'b00)? 1:0;
-                
+
                 // Check if EBREAK
                 o_exception[`EBREAK] <= (system_noncsr && i_inst[21:20]==2'b01)? 1:0;
-                
+
                 // Check if MRET
                  o_exception[`MRET] <= (system_noncsr && i_inst[21:20]==2'b10)? 1:0;
                 /***************************************************************************/
@@ -144,10 +146,10 @@ module rv_decoder(
         opcode_auipc_d  = opcode == `OPCODE_AUIPC;
         opcode_system_d = opcode == `OPCODE_SYSTEM;
         opcode_fence_d  = opcode == `OPCODE_FENCE;
-        
+
         /*********************** decode possible exceptions ***********************/
         system_noncsr = opcode == `OPCODE_SYSTEM && funct3_d == 0 ; //system instruction but not CSR operation
-        
+
         // Check if instruction is illegal    
         valid_opcode = (opcode_rtype_d || opcode_itype_d || opcode_load_d || opcode_store_d || opcode_branch_d || opcode_jal_d || opcode_jalr_d || opcode_lui_d || opcode_auipc_d || opcode_system_d || opcode_fence_d);
         illegal_shift = (opcode_itype_d && (alu_sll_d || alu_srl_d || alu_sra_d)) && i_inst[25];
@@ -172,7 +174,7 @@ module rv_decoder(
         alu_neq_d = 0;
         alu_ge_d = 0; 
         alu_geu_d = 0;
-        
+
         /********** Decode ALU Operation **************/
         if(opcode == `OPCODE_RTYPE || opcode == `OPCODE_ITYPE) begin
             if(opcode == `OPCODE_RTYPE) begin
@@ -201,6 +203,7 @@ module rv_decoder(
 
         else alu_add_d = 1'b1; //add operation for all remaining instructions
         /*********************************************/
+
         /************************** extend the immediate (o_imm) *********************/
         case(opcode)
         `OPCODE_ITYPE , `OPCODE_LOAD , `OPCODE_JALR: imm_d = {{20{i_inst[31]}},i_inst[31:20]}; 
@@ -212,7 +215,8 @@ module rv_decoder(
                      default: imm_d = 0;
         endcase
         /**************************************************************************/
-        
+
     end
-    
+
 endmodule
+
