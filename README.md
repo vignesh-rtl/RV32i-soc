@@ -1,50 +1,56 @@
-# RV32I SoC RTL Project
+# RV32I Zyn_SoC (v3.0)
 
-This repository contains an in-progress RV32I SoC RTL implementation.
+A work-in-progress RV32I RTL SoC project.
 
-> **Status:** Code is under active update.
+> **Status:** Codes are under update.
 
-## Repository Structure
+## Repository Structure (Current)
 
-- `rtl/` — RTL source modules (fetch, decoder, base register, shared header)
-- `sim/` — Main simulation testbench sources
-- `icarus/` — Icarus Verilog-specific testbench files
-- `docs/` — PDF documentation for implemented modules
+- `rtl/` — Core RTL modules (active development)
+- `sim/` — Simulation testbench sources
+- `icarus/` — Icarus-oriented testbench variants
+- `docs/` — Design and module documentation PDFs
 
-## RTL Modules (`rtl/`)
+## `rtl/` Folder Overview (Current Files)
 
-| File | Description |
+| File | Purpose (3 words) |
 |---|---|
-| `rtl/rv_fetch.v` | Instruction fetch stage RTL |
-| `rtl/rv_decoder.v` | RV32I instruction decoder RTL |
-| `rtl/rv_basereg.v` | Base register file RTL |
-| `rtl/rv_header.vh` | Shared RTL defines/macros |
+| `rtl/rv_fetch.v` | Instruction fetch stage |
+| `rtl/rv_decoder.v` | Instruction decode logic |
+| `rtl/rv_basereg.v` | Base register file |
+| `rtl/rv_header.vh` | Shared RTL definitions |
+| `rtl/rv_forwarding.v` | Pipeline forwarding logic |
 
-## Documentation (`docs/`)
+## Current Development Scope
 
-- `docs/rv32i_fetch_documentation.pdf`
-- `docs/rv_fetch_document.pdf`
-- `docs/zyn_basereg_documentation.pdf`
-
-## Current Development Coverage
-
-Implemented so far and being refined:
+Implemented and being refined:
 - Fetch stage
 - Decoder stage
 - Base register block
+- Forwarding module
 
-## Simulation (Icarus Verilog)
+## Simulation Note
 
-Example run from repository root:
+To run Icarus Verilog simulation (example):
+A learning-oriented RTL System-on-Chip project for a RISC-V RV32I core.
+
+> **Project status:** Codes are under update.
+
+## Simulation Notes
+
+- `sim/rv_fetch_TB.v` is used for `rv_fetch.v` simulation.
+- `icarus/TB_rv_fetch.v` contains the Icarus Verilog testbench setup.
+
+### Example Icarus Run Command
 
 ```bash
-iverilog -o sim/out sim/rv_fetch_TB.v rtl/rv_fetch.v rtl/rv_header.vh && vvp sim/out
+iverilog -o sim TB_rv_fetch.v rv_fetch.v rv_header.vh && vvp sim
 ```
 
 ## Version Notes
 
-- Previous versions are available through tags: `v1.0`, `v2.0`
+- Previous versions are available via tags: `v1.0`, `v2.0`
 
 ## Open-Source Reference
 
-- Angelo Jacobo — RISC-V reference repository: https://github.com/AngeloJacobo/RISC-V
+- Angelo Jacobo’s RISC-V repository: https://github.com/AngeloJacobo/RISC-V
