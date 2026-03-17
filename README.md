@@ -1,22 +1,42 @@
-RV32I Zyn_SoC — Version 3.0
+# RV32I SoC (RTL Development)
 
-Fetch  modules redesigned.
+This repository contains an RV32I SoC RTL project that is currently under development.
 
-sim - rv_fetch_TB.v for rv_fetch.v simulation code.
+> **Status:** Code is under update.
 
-Icarus - TB_rv_fetech.v --65 testcases done with Claude AI Test cases.
+## Repository Structure
 
-Previous versions available through tags v1.0 and v2.0.
+- `rtl/` — RTL source files
+- `sim/` — Simulation testbench files
+- `icarus/` — Icarus Verilog testbench variant
+- `docs/` — PDF documentation
 
----
-To run the icarus verilog simulation run the following command:
+## Current RTL Files
 
+| File | Description |
+|---|---|
+| `rtl/rv_fetch.v` | Fetch stage logic |
+| `rtl/rv_decoder.v` | Decoder stage logic |
+| `rtl/rv_basereg.v` | Base register file |
+| `rtl/rv_header.vh` | Common RTL definitions |
+
+## Simulation Files
+
+- `sim/rv_fetch_TB.v`
+- `icarus/TB_rv_fetch.v`
+
+## Documentation Files
+
+- `docs/rv32i_fetch_documentation.pdf`
+- `docs/rv_fetch_document.pdf`
+- `docs/zyn_basereg_documentation.pdf`
+
+## Example Icarus Run
+
+```bash
+iverilog -o sim/out sim/rv_fetch_TB.v rtl/rv_fetch.v rtl/rv_header.vh && vvp sim/out
 ```
-iverilog -o sim TB_rv_fetch.v rv_fetch.v rv_header.vh && vvp sim      
 
-```
----
-Reference -"Angelo Jacobo - https://github.com/AngeloJacobo/RISC-V "
----
----
-Codes are under update
+## Reference
+
+- Angelo Jacobo — RISC-V: https://github.com/AngeloJacobo/RISC-V
