@@ -21,7 +21,7 @@ A work-in-progress RV32I RTL SoC project.
 | `rtl/rv_header.vh` | Shared RTL definitions |
 | `rtl/rv_forwarding.v` | Pipeline forwarding logic |
 
-## Current Development Scope
+## Current Development Scope 
 
 Implemented and being refined:
 - Fetch stage
