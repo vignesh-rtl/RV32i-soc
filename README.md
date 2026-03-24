@@ -27,6 +27,7 @@ Implemented and being refined:
 - Fetch stage
 - Decoder stage
 - Base register block
+- 
 - Forwarding module
 
 ## Simulation Note
