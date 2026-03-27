@@ -13,7 +13,6 @@ Built from scratch with a 5-stage pipelined RV32I processor core, memory-mapped 
 .
 ├── rtl/            # All Verilog RTL source files (processor core + SoC peripherals)
 ├── firmware/       # Bare-metal C firmware (HAL drivers, startup code, applications)
-├── sim/            # Simulation testbenches (Icarus Verilog)
 ├── icarus/         # Legacy Icarus Verilog testbench variants
 ├── docs/           # Module documentation and design reference PDFs
 └── vivado/         # Vivado TCL scripts for synthesis and flashing
